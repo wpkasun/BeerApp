@@ -1,18 +1,46 @@
 import { useEffect, useState } from 'react';
-import { Beer } from '../../types';
-import { fetchData } from './utils';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchBeers } from '../../store/slices/beersSlice';
+import { ApiParams } from '../../types';
 import { Avatar, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui/material';
 import SportsBar from '@mui/icons-material/SportsBar';
-import { useNavigate } from 'react-router-dom';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 const BeerList = () => {
   const navigate = useNavigate();
-  const [beerList, setBeerList] = useState<Array<Beer>>([]);
+  const [page, setPage] = useState(1);
+  const { data } = useAppSelector((state) => state.beers);
+  const dispatch = useAppDispatch();
 
   // eslint-disable-next-line
-  useEffect(fetchData.bind(this, setBeerList), []);
+  useEffect(() => {
+    dispatch(fetchBeers({ per_page: 10, page: 1 }));
+  }, []);
+
+  /*const {
+    data: movies,
+    page,
+    hasNextPage,
+    error,
+    isLoading,
+  } = useSelector((state) => state.movies);
+
+  useEffect(() => {
+    dispatch(fetchMovies({ page, query }));
+  }, [query]);
+
+  const fetchNextPage = useCallback(
+    () => dispatch(fetchMovies({ page, query })),
+    [page, query]
+  );*/
 
   const onBeerClick = (id: string) => navigate(`/beer/${id}`);
+
+  const onPageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    dispatch(fetchBeers({ per_page: 10, page }));
+  };
 
   return (
     <article>
@@ -22,7 +50,7 @@ const BeerList = () => {
         </header>
         <main>
           <List>
-            {beerList.map((beer) => (
+            {data.map((beer) => (
               <ListItemButton key={beer.id} onClick={onBeerClick.bind(this, beer.id)}>
                 <ListItemAvatar>
                   <Avatar>
@@ -33,6 +61,9 @@ const BeerList = () => {
               </ListItemButton>
             ))}
           </List>
+          <Stack spacing={2} alignItems="center">
+            <Pagination count={10} color="primary" page={page} onChange={onPageChange} />
+          </Stack>
         </main>
       </section>
     </article>

@@ -1,0 +1,25 @@
+.beerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.beerSection {
+    display: flex;
+    align-items: center;
+}
+
+.beerSectionDivider {
+  margin: 20px 0px;
+}
+
+.beerIcon {
+  margin-right: 20px;
+}
+
+.button {
+  margin-top: 20px;
+  position: 'fixed';
+  right: '16px';
+};
