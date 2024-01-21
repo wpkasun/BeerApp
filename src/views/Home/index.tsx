@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { fetchData } from './utils';
 import { Beer } from '../../types';
 import { Link as RouterLink } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+
 import { Button, Checkbox, Paper, TextField, Link } from '@mui/material';
 import styles from './Home.module.css';
 
@@ -11,6 +13,7 @@ const Home = () => {
 
   // eslint-disable-next-line
   useEffect(fetchData.bind(this, setBeerList), []);
+  const { favoriteBeers } = useAppSelector((state) => state.beers);
 
   return (
     <article>
@@ -19,8 +22,8 @@ const Home = () => {
           <Paper>
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
-                <TextField label='Filter...' variant='outlined' />
-                <Button variant='contained'>Reload list</Button>
+                <TextField label="Filter..." variant="outlined" />
+                <Button variant="contained">Reload list</Button>
               </div>
               <ul className={styles.list}>
                 {beerList.map((beer, index) => (
@@ -39,12 +42,12 @@ const Home = () => {
             <div className={styles.listContainer}>
               <div className={styles.listHeader}>
                 <h3>Saved items</h3>
-                <Button variant='contained' size='small'>
+                <Button variant="contained" size="small">
                   Remove all items
                 </Button>
               </div>
               <ul className={styles.list}>
-                {savedList.map((beer, index) => (
+                {favoriteBeers.map((beer, index) => (
                   <li key={index.toString()}>
                     <Checkbox />
                     <Link component={RouterLink} to={`/beer/${beer.id}`}>
@@ -52,7 +55,7 @@ const Home = () => {
                     </Link>
                   </li>
                 ))}
-                {!savedList.length && <p>No saved items</p>}
+                {!favoriteBeers.length && <p>No saved items</p>}
               </ul>
             </div>
           </Paper>
