@@ -13,19 +13,6 @@ export const fetchBeers = createAsyncThunk('beers/fetch', async (params: ApiPara
   }
 });
 
-/*interface FetchMoviesFunction {
-    (options: { page: number; query: string }): Promise<any>; // Replace 'any' with the actual type of your response
-  }
-  
-  const fetchMovies: FetchMoviesFunction = async ({ page, query }) => {
-    try {
-      return await getMoviesByQuery(page, query);
-    } catch (error) {
-      console.error(error);
-      throw new Error("Something went wrong");
-    }
-  };*/
-
 export const fetchBeerById = createAsyncThunk('fetchBeerById', async (id: string) => {
   try {
     return await getBeer(id);
@@ -60,7 +47,6 @@ const beersSlice = createSlice({
   initialState,
   reducers: {
     addFavoriteBeer(state, action) {
-      console.log('ded');
       state.favoriteBeers.push(action.payload);
     },
     resetFavoriteBeers(state, action) {
@@ -84,23 +70,6 @@ const beersSlice = createSlice({
         state.isLoading = false;
         //state.error = action.error;
       });
-    /*.addCase(fetchMovieById.pending, (state) => {
-        state.selectedMovie = null;
-        state.error = null;
-        state.isLoading = true;
-      })
-      .addCase(fetchMovieById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        if (action.payload.Response === "True") {
-          state.selectedMovie = action.payload;
-        } else {
-          state.error = action.payload?.Error;
-        }
-      })
-      .addCase(fetchMovieById.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.error.message;
-      })*/
   },
 });
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { GOOGLE_MAPS_API_KEY } from '../../api/config';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 interface Props {
@@ -17,13 +18,15 @@ const MapContainer = (props: Props) => {
     lng: props.longitude,
   };
 
+  console.log(GOOGLE_MAPS_API_KEY);
+
   return (
     <LoadScript
-      googleMapsApiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''}
+      googleMapsApiKey={GOOGLE_MAPS_API_KEY || ''}
     >
       <GoogleMap
         mapContainerStyle={mapStyles}
-        zoom={15}
+        zoom={10}
         center={defaultCenter}
       >
         <Marker position={defaultCenter} />
