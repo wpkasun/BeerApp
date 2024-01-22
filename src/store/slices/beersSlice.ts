@@ -47,11 +47,18 @@ const beersSlice = createSlice({
   initialState,
   reducers: {
     addFavoriteBeer(state, action) {
-      state.favoriteBeers.push(action.payload);
+      if (!state.favoriteBeers.find((favoriteBeer) => favoriteBeer.id === action.payload.id)) {
+        state.favoriteBeers.push(action.payload);
+      }
     },
-    resetFavoriteBeers(state, action) {
-      //const index = state.indexOf(action.payload);
-      //state.splice(index, 1);
+    removeFavoriteBeer(state, action) {
+      const index = state.favoriteBeers.findIndex((favoriteBeer) => favoriteBeer.id === action.payload.id);
+      if (index !== undefined) {
+        state.favoriteBeers.splice(index, 1);
+      }
+    },
+    resetFavoriteBeers(state) {
+      state.favoriteBeers = [];
     },
   },
   extraReducers(builder) {
@@ -74,4 +81,4 @@ const beersSlice = createSlice({
 });
 
 export default beersSlice.reducer;
-export const { addFavoriteBeer } = beersSlice.actions;
+export const { addFavoriteBeer, removeFavoriteBeer, resetFavoriteBeers } = beersSlice.actions;

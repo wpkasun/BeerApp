@@ -1,6 +1,6 @@
 import React from 'react';
+import { GoogleMap, useLoadScript, Marker, Libraries } from '@react-google-maps/api';
 import { GOOGLE_MAPS_API_KEY } from '../../api/config';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 interface Props {
   latitude: number;
@@ -8,30 +8,36 @@ interface Props {
 }
 
 const MapContainer = (props: Props) => {
+  const center: google.maps.LatLngLiteral = {
+    lat: props.latitude,
+    lng: props.longitude,
+  };
+
+  //const libraries: Libraries = ['places'];
+
   const mapStyles: React.CSSProperties = {
     height: '400px',
     width: '100%',
   };
 
-  const defaultCenter: google.maps.LatLngLiteral = {
-    lat: props.latitude,
-    lng: props.longitude,
-  };
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: GOOGLE_MAPS_API_KEY ? GOOGLE_MAPS_API_KEY : '',
+  });
 
-  console.log(GOOGLE_MAPS_API_KEY);
+  if (loadError) {
+    return <div>Error loading maps</div>;
+  }
+
+  if (!isLoaded) {
+    return <div>Loading maps</div>;
+  }
 
   return (
-    <LoadScript
-      googleMapsApiKey={GOOGLE_MAPS_API_KEY || ''}
-    >
-      <GoogleMap
-        mapContainerStyle={mapStyles}
-        zoom={10}
-        center={defaultCenter}
-      >
-        <Marker position={defaultCenter} />
+    <div>
+      <GoogleMap mapContainerStyle={mapStyles} zoom={10} center={center}>
+        <Marker position={center} />
       </GoogleMap>
-    </LoadScript>
+    </div>
   );
 };
 

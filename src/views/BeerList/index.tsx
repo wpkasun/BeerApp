@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchBeers, addFavoriteBeer } from '../../store/slices/beersSlice';
+import { fetchBeers, addFavoriteBeer, removeFavoriteBeer } from '../../store/slices/beersSlice';
 import { ApiParams, TYPE, SORT } from '../../types';
 import SortButton from '../../components/SortButton';
 import { Beer } from '../../types';
@@ -22,13 +22,25 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import styles from './BeerList.module.css';
 
 const BeerList = () => {
-  const beerTypes = ['ALL', 'micro', 'nano', 'regional', 'brewpub', 'large', 'planning', 'bar', 'contract', 'proprietor', 'closed'];
+  const beerTypes = [
+    'ALL',
+    'micro',
+    'nano',
+    'regional',
+    'brewpub',
+    'large',
+    'planning',
+    'bar',
+    'contract',
+    'proprietor',
+    'closed',
+  ];
 
   //const mItemsPerPage = [10, 20, 30];
 
   const navigate = useNavigate();
 
-  const { beers, page } = useAppSelector((state) => state.beers);
+  const { beers, page, favoriteBeers } = useAppSelector((state) => state.beers);
   const dispatch = useAppDispatch();
 
   /*const fetchBeersWithFilters = (params?: ApiParams) => {
@@ -49,23 +61,47 @@ const BeerList = () => {
   const onBeerClick = (id: string) => navigate(`/beer/${id}`);
 
   const onPageChange = (event: React.ChangeEvent<unknown>, page: number) => {
-    dispatch(fetchBeers({ per_page: 10, page, by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE), sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT) }));
+    dispatch(
+      fetchBeers({
+        per_page: 10,
+        page,
+        by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE),
+        sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT),
+      })
+    );
   };
 
   const onTypeSelect = (event: SelectChangeEvent) => {
     const selectedType: string = event.target.value;
     selectType(selectedType);
-    dispatch(fetchBeers({ per_page: 10, page: 1, by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE), sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT) }));
+    dispatch(
+      fetchBeers({
+        per_page: 10,
+        page: 1,
+        by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE),
+        sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT),
+      })
+    );
   };
 
   const onClickSort = () => {
     setSortingType(!sortInAscending);
-    dispatch(fetchBeers({ per_page: 10, page: 1, by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE), sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT) }));
+    dispatch(
+      fetchBeers({
+        per_page: 10,
+        page: 1,
+        by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE),
+        sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT),
+      })
+    );
   };
 
-  const onClickFavorite = (beer: Beer) => {
-    console.log('HE');
-    dispatch(addFavoriteBeer(beer));
+  const onClickToggleFavorite = (beer: Beer) => {
+    dispatch(
+      favoriteBeers.find((favoriteBeer) => favoriteBeer.id === beer.id)
+        ? removeFavoriteBeer(beer)
+        : addFavoriteBeer(beer)
+    );
   };
 
   return (
@@ -77,8 +113,14 @@ const BeerList = () => {
             <div className={styles.filters}>
               <Box sx={{ minWidth: 120 }}>
                 <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                  <Select labelId="demo-simple-select-label" id="demo-simple-select" value={selectedType} label="Type" onChange={onTypeSelect}>
+                  <InputLabel id='demo-simple-select-label'>Type</InputLabel>
+                  <Select
+                    labelId='demo-simple-select-label'
+                    id='demo-simple-select'
+                    value={selectedType}
+                    label='Type'
+                    onChange={onTypeSelect}
+                  >
                     {beerTypes.map((type) => (
                       <MenuItem key={type} value={type}>
                         {type}
@@ -101,14 +143,23 @@ const BeerList = () => {
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText primary={beer.name} secondary={beer.brewery_type} />
-                <IconButton onClick={() => onClickFavorite(beer)}>
-                  <FavoriteBorderOutlinedIcon />
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onClickToggleFavorite(beer);
+                  }}
+                >
+                  {favoriteBeers.find((favoriteBeer) => favoriteBeer.id === beer.id) ? (
+                    <FavoriteIcon color='primary' />
+                  ) : (
+                    <FavoriteBorderOutlinedIcon />
+                  )}
                 </IconButton>
               </ListItemButton>
             ))}
           </List>
-          <Stack spacing={2} alignItems="center">
-            <Pagination count={10} color="primary" page={page} onChange={onPageChange} />
+          <Stack spacing={2} alignItems='center'>
+            <Pagination count={10} color='primary' page={page} onChange={onPageChange} />
           </Stack>
         </main>
       </section>

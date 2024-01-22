@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Beer as IBeer } from '../../types';
 import { fetchData } from './utils';
-import { addFavoriteBeer } from '../../store/slices/beersSlice';
+import { addFavoriteBeer, removeFavoriteBeer } from '../../store/slices/beersSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 import MapContainer from '../../components/MapContainer';
 
@@ -27,12 +28,19 @@ const Beer = () => {
 
   const dispatch = useAppDispatch();
 
-  const onClickFavorite = (beer: IBeer) => {
-    dispatch(addFavoriteBeer(beer));
+  const { favoriteBeers } = useAppSelector((state) => state.beers);
+
+  const onClickToggleFavorite = (beer: IBeer) => {
+    dispatch(
+      favoriteBeers.find((favoriteBeer) => favoriteBeer.id === beer.id)
+        ? removeFavoriteBeer(beer)
+        : addFavoriteBeer(beer)
+    );
   };
+
   const navigate = useNavigate();
 
-  const onBackButtonClick = () => navigate(`/beer/${id}`);
+  const onBackButtonClick = () => navigate(-1);
 
   return (
     <article>
@@ -40,41 +48,59 @@ const Beer = () => {
         <section>
           <header className={styles.beerHeader}>
             <h1>{beer.name}</h1>
-            <IconButton onClick={() => onClickFavorite(beer)}>
-              <FavoriteBorderOutlinedIcon />
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation();
+                onClickToggleFavorite(beer);
+              }}
+            >
+              {favoriteBeers.find((favoriteBeer) => favoriteBeer.id === beer.id) ? (
+                <FavoriteIcon color='primary' />
+              ) : (
+                <FavoriteBorderOutlinedIcon />
+              )}
             </IconButton>
           </header>
           <main>
-            <span>
-              <b>Type: </b> {beer.brewery_type}
-            </span>
-            <Divider className={styles.beerSectionDivider} />
-            <section className={styles.beerSection}>
-              <LanguageIcon className={styles.beerIcon} />
-              <a href={beer.website_url} target="_blank">
-                {beer.website_url}
-              </a>
-            </section>
-            <Divider className={styles.beerSectionDivider} />
-            <section className={styles.beerSection}>
-              <PhoneIcon className={styles.beerIcon} /> {beer.phone}
-            </section>
-            <Divider className={styles.beerSectionDivider} />
-            <section className={styles.beerSection}>
-              <LocationOnIcon className={styles.beerIcon} />
-              {beer.address_1}
-              {beer.address_2 ? `, ${beer.address_2}` : ''}
-              {beer.address_3 ? `, ${beer.address_3}` : ''}
-              {`, ${beer.city}`}
-              {`, ${beer.state_province}`}
-              {`, ${beer.country}.`}
-              <b>Postal Code: </b>
-              {beer.postal_code}
-            </section>
+            <Grid container spacing={10}>
+              <Grid item xs={12} md={12} lg={4} xl={3}>
+                <div className={styles.type}>
+                  <b>Type: </b> {beer.brewery_type}
+                </div>
+                <div className={styles.beerSection}>
+                  <LanguageIcon className={styles.icon} />
+                  <a href={beer.website_url} target='_blank'>
+                    {beer.website_url}
+                  </a>
+                </div>
+                <Divider className={styles.divider} />
+                <div className={styles.beerSection}>
+                  <PhoneIcon className={styles.icon} /> {beer.phone}
+                </div>
+                <Divider className={styles.divider} />
+                <div className={styles.beerSection}>
+                  <LocationOnIcon className={styles.icon} />
+                  {beer.address_1}
+                  {beer.address_2 ? `, ${beer.address_2}` : ''}
+                  {beer.address_3 ? `, ${beer.address_3}` : ''}
+                  {`, ${beer.city}`}
+                  {`, ${beer.state_province}`}
+                  {`, ${beer.country}. `}
+                  {`[${beer.postal_code}]`}
+                </div>
+              </Grid>
+              <Grid item xs={12} md={12} lg={8} xl={9}>
+                <MapContainer latitude={parseInt(beer.latitude)} longitude={parseInt(beer.longitude)} />
+              </Grid>
+            </Grid>
 
-            <MapContainer latitude={parseInt(beer.latitude)} longitude={parseInt(beer.longitude)} />
-
-            <Button className={styles.button} variant="contained" color="primary" onClick={onBackButtonClick}>
+            <Button
+              fullWidth
+              variant='contained'
+              color='primary'
+              className={styles.backButton}
+              onClick={onBackButtonClick}
+            >
               Back
             </Button>
           </main>
