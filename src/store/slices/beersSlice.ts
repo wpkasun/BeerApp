@@ -23,7 +23,6 @@ export const fetchBeerById = createAsyncThunk('fetchBeerById', async (id: string
 });
 
 interface State {
-  query: string | null;
   beers: Beer[];
   favoriteBeers: Beer[];
   isLoading: boolean;
@@ -33,7 +32,6 @@ interface State {
 }
 
 const initialState: State = {
-  query: null,
   beers: [],
   favoriteBeers: [],
   isLoading: false,

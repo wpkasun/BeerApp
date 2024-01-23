@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchBeers, addFavoriteBeer, removeFavoriteBeer } from '../../store/slices/beersSlice';
-import { ApiParams, TYPE, SORT } from '../../types';
+import { TYPE, SORT } from '../../types';
 import SortButton from '../../components/SortButton';
 import { Beer } from '../../types';
 
@@ -10,7 +10,6 @@ import { Avatar, List, ListItemAvatar, ListItemButton, ListItemText } from '@mui
 import SportsBar from '@mui/icons-material/SportsBar';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
-import { Button, Checkbox, Paper, TextField, Link } from '@mui/material';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -36,25 +35,17 @@ const BeerList = () => {
     'closed',
   ];
 
-  //const mItemsPerPage = [10, 20, 30];
-
   const navigate = useNavigate();
 
   const { beers, page, favoriteBeers } = useAppSelector((state) => state.beers);
   const dispatch = useAppDispatch();
 
-  /*const fetchBeersWithFilters = (params?: ApiParams) => {
-    let defaultParams = { per_page: 10, page };
-    fetchBeers({ ...defaultParams, ...params });
-  };*/
-
   // eslint-disable-next-line
   useEffect(() => {
-    dispatch(fetchBeers({ per_page: 10, page: 1 }));
-    //dispatch(fetchBeers({ per_page: 10, page: 1, by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE), sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT) }));
+    dispatch(fetchBeers({ per_page: 10, page: 1, sort: 'name:asc' as SORT }));
   }, []);
 
-  const [selectedType, selectType] = useState(beerTypes[0]);
+  const [selectedType, setSelectType] = useState(beerTypes[0]);
 
   const [sortInAscending, setSortingType] = useState(true);
 
@@ -66,34 +57,34 @@ const BeerList = () => {
         per_page: 10,
         page,
         by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE),
-        sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT),
+        sort: sortInAscending ? ('name:asc' as SORT) : ('name:desc' as SORT),
       })
     );
   };
 
   const onTypeSelect = (event: SelectChangeEvent) => {
     const selectedType: string = event.target.value;
-    selectType(selectedType);
+    setSelectType(selectedType);
     dispatch(
       fetchBeers({
         per_page: 10,
         page: 1,
         by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE),
-        sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT),
+        sort: sortInAscending ? ('name:asc' as SORT) : ('name:desc' as SORT),
       })
     );
   };
 
   const onClickSort = () => {
-    setSortingType(!sortInAscending);
     dispatch(
       fetchBeers({
         per_page: 10,
         page: 1,
         by_type: selectedType === 'ALL' ? undefined : (selectedType as TYPE),
-        sort: sortInAscending ? ('asc' as SORT) : ('desc' as SORT),
+        sort: !sortInAscending ? ('name:asc' as SORT) : ('name:desc' as SORT),
       })
     );
+    setSortingType(prevValue => !sortInAscending);
   };
 
   const onClickToggleFavorite = (beer: Beer) => {
